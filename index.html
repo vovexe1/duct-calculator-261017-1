@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0f172a">
     <meta name="description" content="국소배기 시스템 원형 덕트 직경 및 상용 규격 계산기">
-    <link rel="manifest" href="manifest.webmanifest">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="manifest" href="/duct-calculator-261017-1/manifest.webmanifest">
+    <link rel="apple-touch-icon" href="/duct-calculator-261017-1/icon-192.png">
     <title>산업환기 덕트 사이즈 계산기</title>
     <!-- FontAwesome for icons -->
     <!-- Google Fonts Inter & Noto Sans KR -->
@@ -28,6 +28,9 @@
       button { border:1px solid #bfdbfe; background:#eff6ff; color:#1d4ed8; border-radius:9px; padding:10px 12px; font-size:13px; font-weight:650; cursor:pointer; }
       .primary { width:100%; background:#2563eb; color:white; border:0; padding:14px; font-size:16px; }
       .hero { background:linear-gradient(135deg,#1e3a8a,#312e81); color:white; border-radius:16px; padding:22px 18px; box-shadow:0 10px 25px #0002; }
+      .install-area { margin-top:12px; }
+      .install-btn { background:#16a34a; color:white; border:0; font-size:14px; padding:10px 14px; }
+      .install-help { color:#dbeafe; font-size:12px; margin:8px 0 0; }
       .pill { display:inline-block; padding:5px 9px; border-radius:20px; background:#ffffff20; color:#dbeafe; font-size:12px; }
       .big { color:#fcd34d; font-size:42px; font-weight:850; margin:16px 0 2px; line-height:1.2; }
       .inch { color:#e2e8f0; font-size:21px; font-weight:700; }
@@ -58,6 +61,7 @@
   <header>
     <h1>국소배기 시스템 덕트 사이즈 계산기</h1>
     <p>산업환기 공학 참고 · 모바일 최적화 · 오프라인 사용 가능</p>
+    <div class="install-area"><button id="installButton" class="install-btn" type="button" hidden>앱 설치</button><p id="installHelp" class="install-help">설치 버튼이 안 보이면 Chrome 메뉴(⋮)에서 ‘앱 설치’ 또는 ‘홈 화면에 추가’를 선택하세요.</p></div>
   </header>
   <main>
     <section>
@@ -203,10 +207,39 @@
     calculateDuctSize();
   });
 
-  // GitHub Pages에서 접속할 때만 오프라인 캐시를 등록
-  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(() => {}));
+  // GitHub Pages 프로젝트 경로에 맞춰 서비스 워커 등록
+  if ('serviceWorker' in navigator && location.protocol === 'https:') {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/duct-calculator-261017-1/service-worker.js', {
+        scope: '/duct-calculator-261017-1/'
+      }).catch((err) => console.error('서비스 워커 등록 실패:', err));
+    });
   }
+
+  // Chrome/Android에서 설치 조건을 충족하면 페이지 안에 설치 버튼 표시
+  let deferredInstallPrompt = null;
+  const installButton = document.getElementById('installButton');
+  const installHelp = document.getElementById('installHelp');
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    installButton.hidden = false;
+    installHelp.textContent = '버튼을 눌러 계산기를 휴대폰 앱처럼 설치할 수 있습니다.';
+  });
+  installButton.addEventListener('click', async () => {
+    if (!deferredInstallPrompt) {
+      installHelp.textContent = 'Chrome 메뉴(⋮) → 앱 설치 또는 홈 화면에 추가를 이용해 주세요.';
+      return;
+    }
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    installButton.hidden = true;
+  });
+  window.addEventListener('appinstalled', () => {
+    installButton.hidden = true;
+    installHelp.textContent = '덕트 계산기가 설치되었습니다.';
+  });
 </script>
 </body>
 </html>

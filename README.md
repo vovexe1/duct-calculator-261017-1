@@ -1,28 +1,18 @@
-# 국소배기 덕트 사이즈 계산기
+# 국소배기 덕트 사이즈 계산기 — vovexe1 GitHub Pages용
 
-GitHub Pages로 배포할 수 있는 모바일 최적화 계산기입니다.
-
-## GitHub Pages 배포
-
-1. GitHub에서 새 저장소(repository)를 만듭니다.
-2. 이 ZIP의 **압축을 푼 파일 전체**를 저장소 최상위(root)에 업로드합니다.
-3. 저장소의 **Settings → Pages**로 이동합니다.
-4. **Build and deployment → Source**에서 `Deploy from a branch`를 선택합니다.
-5. Branch는 `main`, 폴더는 `/(root)`로 선택한 뒤 Save를 누릅니다.
-6. 배포가 완료되면 표시된 GitHub Pages 주소를 엽니다.
-
-## 안드로이드 홈 화면에 추가
-
-1. GitHub Pages 주소를 Android Chrome에서 엽니다.
-2. Chrome 메뉴(⋮)에서 `앱 설치` 또는 `홈 화면에 추가`를 선택합니다.
-3. 설치 메뉴가 바로 보이지 않으면 사이트가 배포된 뒤 HTTPS 주소로 다시 접속하고 잠시 기다립니다.
+## 업로드 방법
+1. 이 ZIP을 다운로드한 뒤 압축을 풉니다.
+2. GitHub 저장소 `duct-calculator-261017-1`의 최상위(root)에 ZIP 자체가 아니라 압축 안의 파일을 모두 업로드합니다.
+3. 기존 파일을 덮어쓸지 묻는 경우 `index.html`, `manifest.webmanifest`, `service-worker.js`를 포함해 모두 교체합니다.
+4. Settings → Pages에서 Branch `main`, Folder `/(root)`인지 확인합니다.
+5. 배포 완료 후 Android Chrome에서 https://vovexe1.github.io/duct-calculator-261017-1/ 를 엽니다.
+6. 페이지에서 `앱 설치` 버튼이 나타나면 누릅니다. 버튼이 나타나지 않으면 Chrome 메뉴(⋮)에서 `앱 설치` 또는 `홈 화면에 추가`를 선택합니다.
 
 ## 포함 파일
+- `index.html` — 계산기 및 설치 버튼
+- `manifest.webmanifest` — 이 저장소 경로에 맞춘 설치 정보
+- `service-worker.js` — 오프라인 캐시 및 fetch 처리
+- `icon-192.png`, `icon-512.png` — 앱 아이콘
+- `.nojekyll`, `README.md`
 
-- `index.html`: 계산기 본체
-- `manifest.webmanifest`: PWA 앱 정보
-- `service-worker.js`: 오프라인 캐시
-- `icon-192.png`, `icon-512.png`: 앱 아이콘
-- `.nojekyll`: GitHub Pages의 Jekyll 처리 비활성화
-
-참고: GitHub Pages는 웹앱을 호스팅합니다. 이 패키지는 APK 파일이 아닙니다.
+참고: 이 파일은 APK가 아니라 GitHub Pages용 PWA입니다. Chrome/Android의 설치 메뉴는 브라우저 버전, 설치 상태, 웹앱의 설치 조건에 따라 달라질 수 있습니다.
