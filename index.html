@@ -2,244 +2,449 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#0f172a">
-    <meta name="description" content="국소배기 시스템 원형 덕트 직경 및 상용 규격 계산기">
-    <link rel="manifest" href="/duct-calculator-261017-1/manifest.webmanifest">
-    <link rel="apple-touch-icon" href="/duct-calculator-261017-1/icon-192.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>산업환기 덕트 사이즈 계산기</title>
+    
+    <!-- PWA Primary Meta Tags -->
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="덕트계산기">
+
+    <!-- App Icon (Embedded SVG for standalone display) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%232563eb'><path d='M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256 256-114.6 256-256S397.4 0 256 0zm0 464c-114.7 0-208-93.3-208-208S141.3 48 256 48s208 93.3 208 208-93.3 208-208 208z'/><path fill='%233b82f6' d='M256 128c-70.7 0-128 57.3-128 128s57.3 128 128 128 128-57.3 128-128-57.3-128-128-128zm0 208c-44.1 0-80-35.9-80-80s35.9-80 80-80 80 35.9 80 80-35.9 80-80 80z'/></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%232563eb'><rect width='512' height='512' rx='100' fill='%230f172a'/><path fill='%233b82f6' d='M256 128c-70.7 0-128 57.3-128 128s57.3 128 128 128 128-57.3 128-128-57.3-128-128-128zm0 208c-44.1 0-80-35.9-80-80s35.9-80 80-80 80 35.9 80 80-35.9 80-80 80z'/></svg>">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts Inter & Noto Sans KR -->
-
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-      * { box-sizing: border-box; }
-      body { margin:0; font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif; background:#f1f5f9; color:#1e293b; padding-bottom:24px; }
-      header { background:#0f172a; color:white; padding:20px 16px; box-shadow:0 3px 10px #0002; }
-      header h1 { font-size:20px; line-height:1.4; margin:0 0 5px; }
-      header p { color:#cbd5e1; font-size:12px; margin:0; }
-      main, footer { width:min(100% - 24px, 760px); margin:16px auto; }
-      section { margin-bottom:16px; }
-      .panel, .result-card, .theory, .formula { background:white; border:1px solid #e2e8f0; border-radius:16px; padding:18px; margin-bottom:14px; box-shadow:0 5px 18px #0f172a0a; }
-      h2 { font-size:17px; margin:0 0 16px; color:#0f172a; }
-      label { display:block; font-size:14px; font-weight:700; margin:0 0 7px; }
-      input { display:block; width:100%; font-size:18px; padding:13px 12px; border:1px solid #cbd5e1; border-radius:10px; margin-bottom:15px; background:#fff; color:#0f172a; }
-      .hint { font-size:12px; color:#64748b; margin:-9px 0 16px; }
-      .presets { display:flex; flex-wrap:wrap; gap:7px; margin:8px 0 16px; }
-      button { border:1px solid #bfdbfe; background:#eff6ff; color:#1d4ed8; border-radius:9px; padding:10px 12px; font-size:13px; font-weight:650; cursor:pointer; }
-      .primary { width:100%; background:#2563eb; color:white; border:0; padding:14px; font-size:16px; }
-      .hero { background:linear-gradient(135deg,#1e3a8a,#312e81); color:white; border-radius:16px; padding:22px 18px; box-shadow:0 10px 25px #0002; }
-      .install-area { margin-top:12px; }
-      .install-btn { background:#16a34a; color:white; border:0; font-size:14px; padding:10px 14px; }
-      .install-help { color:#dbeafe; font-size:12px; margin:8px 0 0; }
-      .pill { display:inline-block; padding:5px 9px; border-radius:20px; background:#ffffff20; color:#dbeafe; font-size:12px; }
-      .big { color:#fcd34d; font-size:42px; font-weight:850; margin:16px 0 2px; line-height:1.2; }
-      .inch { color:#e2e8f0; font-size:21px; font-weight:700; }
-      .stats { display:grid; grid-template-columns:1fr 1fr; gap:12px; border-top:1px solid #ffffff30; margin-top:18px; padding-top:15px; }
-      .stats small { display:block; color:#cbd5e1; font-size:11px; margin-bottom:5px; }
-      .stats strong { color:#a7f3d0; font-size:16px; }
-      .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-      .metric { background:#f8fafc; border:1px solid #e2e8f0; border-radius:11px; padding:12px; }
-      .metric small { display:block; color:#64748b; font-size:12px; margin-bottom:5px; }
-      .metric strong { font-size:19px; }
-      .theory { background:#fffbeb; border-color:#fde68a; font-size:13px; line-height:1.65; }
-      .theory h3 { margin:0 0 8px; color:#92400e; font-size:15px; }
-      details summary { font-weight:700; cursor:pointer; }
-      table { width:100%; border-collapse:collapse; margin-top:12px; font-size:13px; text-align:center; }
-      th,td { border:1px solid #e2e8f0; padding:8px; }
-      th { background:#f1f5f9; }
-      .table-wrap { max-height:260px; overflow:auto; }
-      .formula { font-size:12px; color:#475569; }
-      .formula h3 { color:#0f172a; margin:0 0 12px; font-size:15px; }
-      .formula-grid { display:grid; grid-template-columns:1fr; gap:8px; text-align:center; }
-      .formula-grid div { background:#f8fafc; border:1px solid #e2e8f0; border-radius:9px; padding:10px; }
-      .formula-grid b { display:block; margin:5px; color:#334155; font-family:monospace; }
-      .error { color:#b91c1c; font-size:13px; margin-top:8px; }
-      @media (min-width:680px) { main { display:grid; grid-template-columns:0.9fr 1.1fr; gap:16px; align-items:start; } .formula-grid { grid-template-columns:repeat(3,1fr); } }
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f1f5f9;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
     </style>
+
+    <!-- Dynamic PWA Manifest & Service Worker Registration Script -->
+    <script>
+        // Inline Manifest Generation
+        const manifestData = {
+            "name": "산업환기 덕트 사이즈 계산기",
+            "short_name": "덕트계산기",
+            "start_url": "./",
+            "display": "standalone",
+            "background_color": "#0f172a",
+            "theme_color": "#0f172a",
+            "orientation": "portrait-primary",
+            "icons": [
+                {
+                    "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%232563eb'><rect width='512' height='512' rx='100' fill='%230f172a'/><path fill='%233b82f6' d='M256 128c-70.7 0-128 57.3-128 128s57.3 128 128 128 128-57.3 128-128-57.3-128-128-128zm0 208c-44.1 0-80-35.9-80-80s35.9-80 80-80 80 35.9 80 80-35.9 80-80 80z'/></svg>",
+                    "sizes": "192x192 512x512",
+                    "type": "image/svg+xml",
+                    "purpose": "any maskable"
+                }
+            ]
+        };
+
+        const stringManifest = JSON.stringify(manifestData);
+        const blobManifest = new Blob([stringManifest], {type: 'application/json'});
+        const manifestUrl = URL.createObjectURL(blobManifest);
+        const linkManifest = document.createElement('link');
+        linkManifest.rel = 'manifest';
+        linkManifest.href = manifestUrl;
+        document.head.appendChild(linkManifest);
+
+        // Service Worker Script via Blob
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'duct-calc-v1';
+                self.addEventListener('install', (e) => {
+                    self.skipWaiting();
+                });
+                self.addEventListener('activate', (e) => {
+                    e.waitUntil(clients.claim());
+                });
+                self.addEventListener('fetch', (e) => {
+                    e.respondWith(
+                        fetch(e.request).catch(() => caches.match(e.request))
+                    );
+                });
+            `;
+            const blobSW = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blobSW);
+
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register(swUrl)
+                    .then(reg => console.log('PWA SW Registered successfully'))
+                    .catch(err => console.log('PWA SW Reg failed: ', err));
+            });
+        }
+    </script>
 </head>
-<body>
-  <header>
-    <h1>국소배기 시스템 덕트 사이즈 계산기</h1>
-    <p>산업환기 공학 참고 · 모바일 최적화 · 오프라인 사용 가능</p>
-    <div class="install-area"><button id="installButton" class="install-btn" type="button" hidden>앱 설치</button><p id="installHelp" class="install-help">설치 버튼이 안 보이면 Chrome 메뉴(⋮)에서 ‘앱 설치’ 또는 ‘홈 화면에 추가’를 선택하세요.</p></div>
-  </header>
-  <main>
-    <section>
-      <div class="panel">
-        <h2>설계 조건 입력</h2>
-        <label for="flowRate">풍량 Q (m³/min)</label>
-        <input type="number" id="flowRate" step="any" min="0" inputmode="decimal" value="30" placeholder="예: 30">
-        <p class="hint">분당 필요 환기량(CMM)</p>
-        <label for="velocity">덕트 속도 V (m/s)</label>
-        <input type="number" id="velocity" step="any" min="0" inputmode="decimal" value="15" placeholder="예: 15">
-        <p class="hint">최소 반송속도를 고려해 설정하세요.</p>
-        <div class="presets">
-          <button type="button" onclick="setPresetVelocity(10)">가스·연기 10 m/s</button>
-          <button type="button" onclick="setPresetVelocity(15)">미세분진 15 m/s</button>
-          <button type="button" onclick="setPresetVelocity(20)">무거운 분진 20 m/s</button>
+<body class="min-h-screen text-slate-800 pb-12 select-none">
+
+    <!-- Header Section -->
+    <header class="bg-slate-900 text-white py-5 px-4 shadow-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-blue-600 p-2.5 rounded-xl shadow-inner flex items-center justify-center">
+                    <i class="fa-solid fa-fan text-xl text-white animate-spin" style="animation-duration: 8s;"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg md:text-xl font-bold tracking-tight">덕트 사이즈 계산기</h1>
+                    <p class="text-[11px] text-slate-400">국소배기시스템 (한성대, 박두용 교재)</p>
+                </div>
+            </div>
+
+            <!-- Native PWA Install Button (Dynamic) -->
+            <button id="pwaInstallBtn" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-lg transition flex items-center gap-1.5 animate-pulse">
+                <i class="fa-solid fa-download"></i>
+                <span>앱으로 설치</span>
+            </button>
         </div>
-        <button type="button" class="primary" onclick="calculateDuctSize()">덕트 규격 산출하기</button>
-        <p id="error" class="error" role="alert"></p>
-      </div>
-      <div class="panel">
-        <details>
-          <summary>상용 덕트 규격표 (24종)</summary>
-          <div class="table-wrap">
-            <table><thead><tr><th>inch</th><th>mm</th></tr></thead><tbody id="standardTableBody"></tbody></table>
-          </div>
-        </details>
-      </div>
-    </section>
-    <section>
-      <div class="hero">
-        <span class="pill">최종 상용 규격 추천</span>
-        <div class="big" id="resStdMm">0 mm</div>
-        <div class="inch" id="resStdInch">(0 inch)</div>
-        <div class="stats">
-          <div><small>상용 규격 적용 시 실제 속도</small><strong id="resActualVel">0 m/s</strong></div>
-          <div><small>속도 변화율</small><strong id="resVelChange">0%</strong></div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl mx-auto px-4 mt-5 grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+        <!-- Input & Controls Section (Left/Top) -->
+        <section class="lg:col-span-5 space-y-5">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 card-shadow">
+                <h2 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-blue-600"></i> 설계 조건 입력
+                </h2>
+
+                <form id="calcForm" onsubmit="event.preventDefault();" class="space-y-4">
+                    <!-- Air Flow Q -->
+                    <div>
+                        <label for="flowRate" class="block text-xs font-semibold text-slate-700 mb-1">
+                            풍량 $Q$ <span class="text-blue-600 font-normal">(m³/min)</span>
+                        </label>
+                        <div class="relative rounded-lg shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                <i class="fa-solid fa-wind"></i>
+                            </div>
+                            <input type="number" id="flowRate" step="any" placeholder="예: 30" value="30" inputmode="decimal"
+                                class="w-full pl-10 pr-16 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-900 text-base font-medium transition" required>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-xs font-semibold text-slate-500 bg-slate-100 rounded-r-lg px-2 border-l border-slate-300">
+                                m³/min
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-1">분당 필요 환기량 (CMM)</p>
+                    </div>
+
+                    <!-- Duct Velocity V -->
+                    <div>
+                        <label for="velocity" class="block text-xs font-semibold text-slate-700 mb-1">
+                            덕트 속도 $V$ <span class="text-blue-600 font-normal">(m/s)</span>
+                        </label>
+                        <div class="relative rounded-lg shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                <i class="fa-solid fa-gauge-high"></i>
+                            </div>
+                            <input type="number" id="velocity" step="any" placeholder="예: 15" value="15" inputmode="decimal"
+                                class="w-full pl-10 pr-16 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-900 text-base font-medium transition" required>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-xs font-semibold text-slate-500 bg-slate-100 rounded-r-lg px-2 border-l border-slate-300">
+                                m/s
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-1">최소반송속도 고려 속도 설정</p>
+                    </div>
+
+                    <!-- Preset Velocities for quick select -->
+                    <div>
+                        <span class="block text-[11px] font-semibold text-slate-500 mb-1.5">자주 쓰는 반송속도 단축 선택:</span>
+                        <div class="grid grid-cols-3 gap-1.5">
+                            <button type="button" onclick="setPresetVelocity(10)" class="text-xs bg-slate-100 active:bg-blue-600 active:text-white text-slate-700 px-2 py-2 rounded-lg border border-slate-200 font-medium transition text-center">가스/연기<br><span class="font-bold">10 m/s</span></button>
+                            <button type="button" onclick="setPresetVelocity(15)" class="text-xs bg-slate-100 active:bg-blue-600 active:text-white text-slate-700 px-2 py-2 rounded-lg border border-slate-200 font-medium transition text-center">미세분진<br><span class="font-bold">15 m/s</span></button>
+                            <button type="button" onclick="setPresetVelocity(20)" class="text-xs bg-slate-100 active:bg-blue-600 active:text-white text-slate-700 px-2 py-2 rounded-lg border border-slate-200 font-medium transition text-center">무거운분진<br><span class="font-bold">20 m/s</span></button>
+                        </div>
+                    </div>
+
+                    <button type="button" id="calcBtn" onclick="calculateDuctSize()"
+                        class="w-full bg-blue-600 active:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition duration-150 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-calculator"></i> 덕트 규격 계산하기
+                    </button>
+                </form>
+            </div>
+
+            <!-- Standard Sizes Reference Table Modal Trigger / Collapsible -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 card-shadow">
+                <details class="group">
+                    <summary class="flex justify-between items-center font-semibold text-slate-800 cursor-pointer list-none">
+                        <span class="flex items-center gap-2 text-xs">
+                            <i class="fa-solid fa-table text-slate-500"></i> 상용 덕트 규격표 참조 (24종)
+                        </span>
+                        <span class="transition group-open:rotate-180">
+                            <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
+                        </span>
+                    </summary>
+                    <div class="mt-3 pt-3 border-t border-slate-100 max-h-56 overflow-y-auto pr-1">
+                        <table class="w-full text-xs text-center border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-600 sticky top-0">
+                                    <th class="py-1.5 px-2 border border-slate-200">inch</th>
+                                    <th class="py-1.5 px-2 border border-slate-200">mm</th>
+                                </tr>
+                            </thead>
+                            <tbody id="standardTableBody" class="divide-y divide-slate-100 text-slate-700">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <!-- Output & Explanation Section (Right/Bottom) -->
+        <section class="lg:col-span-7 space-y-5">
+
+            <!-- Result Cards -->
+            <div id="resultContainer" class="space-y-4">
+
+                <!-- Standard Selected Spec (Featured Result) -->
+                <div class="bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-900 text-white p-6 rounded-2xl shadow-xl relative overflow-hidden">
+                    <div class="absolute -right-6 -bottom-6 opacity-10 pointer-events-none">
+                        <i class="fa-solid fa-circle-dot text-9xl"></i>
+                    </div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="bg-blue-500/30 text-blue-200 border border-blue-400/30 text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1">
+                            <i class="fa-solid fa-circle-check text-green-400"></i> 최종 추천 상용 규격
+                        </span>
+                        <span class="text-[11px] text-blue-300">최소반송속도 충족</span>
+                    </div>
+
+                    <div class="mt-3 flex items-baseline gap-3">
+                        <div class="text-4xl sm:text-5xl font-black text-amber-300 tracking-tight" id="resStdMm">
+                            0 <span class="text-xl font-normal text-white">mm</span>
+                        </div>
+                        <div class="text-2xl font-bold text-slate-300" id="resStdInch">
+                            (0 inch)
+                        </div>
+                    </div>
+
+                    <div class="mt-5 pt-4 border-t border-blue-800/80 grid grid-cols-2 gap-3 text-xs">
+                        <div>
+                            <span class="text-slate-400 block mb-0.5">상용 규격 적용 시 실제 속도</span>
+                            <span class="text-base font-semibold text-emerald-300" id="resActualVel">0 m/s</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block mb-0.5">속도 변화율</span>
+                            <span class="text-base font-semibold text-slate-200" id="resVelChange">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Theoretical Calculation Details -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 card-shadow grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div class="col-span-2 sm:col-span-3 pb-2 border-b border-slate-100 flex justify-between items-center">
+                        <h3 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                            <i class="fa-solid fa-square-root-variable text-blue-600"></i> 이론 계산 결과 (최대 허용 크기)
+                        </h3>
+                    </div>
+
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <span class="text-[11px] text-slate-500 block mb-0.5">단면적 ($A$)</span>
+                        <span class="text-base font-bold text-slate-800" id="resArea">0</span>
+                        <span class="text-[10px] text-slate-500">m²</span>
+                    </div>
+
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <span class="text-[11px] text-slate-500 block mb-0.5">이론 직경 ($D_{mm}$)</span>
+                        <span class="text-base font-bold text-slate-800" id="resTheoMm">0</span>
+                        <span class="text-[10px] text-slate-500">mm</span>
+                    </div>
+
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 col-span-2 sm:col-span-1">
+                        <span class="text-[11px] text-slate-500 block mb-0.5">이론 직경 ($D_{cm}$)</span>
+                        <span class="text-base font-bold text-slate-800" id="resTheoCm">0</span>
+                        <span class="text-[10px] text-slate-500">cm</span>
+                    </div>
+                </div>
+
+                <!-- Theory Explanation Card -->
+                <div class="bg-amber-50/80 border border-amber-200 p-4 rounded-2xl text-slate-800 text-xs space-y-2">
+                    <h4 class="font-bold text-amber-900 text-xs flex items-center gap-1.5">
+                        <i class="fa-solid fa-lightbulb text-amber-600"></i> 교재 규격 선정 핵심 포인트
+                    </h4>
+                    <p class="leading-relaxed text-slate-700">
+                        이론식으로 산출된 덕트 크기는 <strong class="text-amber-950 font-semibold">최대 크기</strong>입니다.
+                        계산된 값보다 큰 덕트를 사용할 경우, 덕트 내 풍속이 최소반송속도 이하로 감소하여 <strong>분진이 침전</strong>될 위험이 있습니다.
+                    </p>
+                    <p class="text-slate-600">
+                        따라서 계산된 직경 <span class="font-bold text-blue-700 underline decoration-amber-400">이하에서 가장 큰 상용 제품</span>을 선택해야 최소반송속도를 만족시킬 수 있습니다.
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-4xl mx-auto px-4 mt-6">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 card-shadow text-xs text-slate-600">
+            <h5 class="font-bold text-slate-800 mb-2 flex items-center gap-1.5">
+                <i class="fa-solid fa-book-open text-slate-500"></i> 적용 수식 공식
+            </h5>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center text-[11px]">
+                <div class="p-2 bg-slate-50 rounded-lg border border-slate-100">
+                    <p class="text-slate-400">단면적 $A$</p>
+                    <p class="font-mono font-semibold text-slate-700">A = Q / V</p>
+                </div>
+                <div class="p-2 bg-slate-50 rounded-lg border border-slate-100">
+                    <p class="text-slate-400">덕트 직경 $D$</p>
+                    <p class="font-mono font-semibold text-slate-700">D = √(4A / π)</p>
+                </div>
+                <div class="p-2 bg-slate-50 rounded-lg border border-slate-100">
+                    <p class="text-slate-400">실제 속도 $V_{act}$</p>
+                    <p class="font-mono font-semibold text-slate-700">V = Q / A_std</p>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="result-card">
-        <h2>이론 계산 결과 (최대 크기)</h2>
-        <div class="grid">
-          <div class="metric"><small>단면적 A</small><strong id="resArea">0</strong><small>m²</small></div>
-          <div class="metric"><small>이론 직경</small><strong id="resTheoMm">0</strong><small>mm</small></div>
-          <div class="metric"><small>이론 직경</small><strong id="resTheoCm">0</strong><small>cm</small></div>
-        </div>
-      </div>
-      <div class="theory">
-        <h3>상용제품 규격 선정 방법</h3>
-        계산된 덕트 직경 이하에서 가장 큰 상용 규격을 선택합니다. 직경이 계산값보다 커지면 덕트 내부 속도가 요구 속도보다 낮아져 분진이 침전될 수 있습니다. 작은 규격을 선택하면 속도는 높아지지만 압력손실이 증가할 수 있습니다.
-      </div>
-    </section>
-  </main>
-  <footer class="formula">
-    <h3>사용된 공학 수식</h3>
-    <div class="formula-grid">
-      <div>단면적 계산<b>A = Q / V</b><small>Q: m³/s, V: m/s</small></div>
-      <div>원형 덕트 직경<b>D = √(4A / π)</b></div>
-      <div>실제 유속<b>V = Q / A</b></div>
-    </div>
-  </footer>
-<script>
-  // 상용 원형 덕트 규격표
-  const STANDARD_SIZES = [
-    { inch: '3/8', mm: 10 }, { inch: '1/2', mm: 15 }, { inch: '3/4', mm: 20 },
-    { inch: '1', mm: 25 }, { inch: '1,1/4', mm: 32 }, { inch: '1,1/2', mm: 40 },
-    { inch: '2', mm: 50 }, { inch: '2,1/2', mm: 65 }, { inch: '3', mm: 80 },
-    { inch: '3,1/2', mm: 90 }, { inch: '4', mm: 100 }, { inch: '5', mm: 125 },
-    { inch: '6', mm: 150 }, { inch: '8', mm: 200 }, { inch: '10', mm: 250 },
-    { inch: '12', mm: 300 }, { inch: '14', mm: 350 }, { inch: '16', mm: 400 },
-    { inch: '18', mm: 450 }, { inch: '20', mm: 500 }, { inch: '22', mm: 550 },
-    { inch: '24', mm: 600 }, { inch: '26', mm: 650 }, { inch: '30', mm: 750 }
-  ];
+    </footer>
 
-  function setPresetVelocity(value) {
-    document.getElementById('velocity').value = value;
-    calculateDuctSize();
-  }
+    <!-- JavaScript Calculation & PWA Prompt Logic -->
+    <script>
+        // Standard Duct Sizes List
+        const STANDARD_SIZES = [
+            { inch: '3/8', mm: 10 },
+            { inch: '1/2', mm: 15 },
+            { inch: '3/4', mm: 20 },
+            { inch: '1', mm: 25 },
+            { inch: '1,1/4', mm: 32 },
+            { inch: '1,1/2', mm: 40 },
+            { inch: '2', mm: 50 },
+            { inch: '2,1/2', mm: 65 },
+            { inch: '3', mm: 80 },
+            { inch: '3,1/2', mm: 90 },
+            { inch: '4', mm: 100 },
+            { inch: '5', mm: 125 },
+            { inch: '6', mm: 150 },
+            { inch: '8', mm: 200 },
+            { inch: '10', mm: 250 },
+            { inch: '12', mm: 300 },
+            { inch: '14', mm: 350 },
+            { inch: '16', mm: 400 },
+            { inch: '18', mm: 450 },
+            { inch: '20', mm: 500 },
+            { inch: '22', mm: 550 },
+            { inch: '24', mm: 600 },
+            { inch: '26', mm: 650 },
+            { inch: '30', mm: 750 }
+        ];
 
-  function calculateDuctSize() {
-    const flowInput = document.getElementById('flowRate');
-    const velocityInput = document.getElementById('velocity');
-    const error = document.getElementById('error');
-    const flowM3Min = Number(flowInput.value);
-    const targetVelocity = Number(velocityInput.value);
+        let deferredPrompt;
+        const installBtn = document.getElementById('pwaInstallBtn');
 
-    if (!flowInput.value || !velocityInput.value || !Number.isFinite(flowM3Min) || !Number.isFinite(targetVelocity) || flowM3Min <= 0 || targetVelocity <= 0) {
-      error.textContent = '풍량과 덕트 속도에 0보다 큰 숫자를 입력하세요.';
-      ['resStdMm','resStdInch','resActualVel','resVelChange','resArea','resTheoMm','resTheoCm'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = '—';
-      });
-      return;
-    }
-    error.textContent = '';
+        // Handle PWA Installation Event
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.classList.remove('hidden');
+        });
 
-    // 입력 풍량은 m³/min이므로 m³/s로 변환
-    const flowM3Sec = flowM3Min / 60;
-    const areaM2 = flowM3Sec / targetVelocity;
-    const diameterM = Math.sqrt((4 * areaM2) / Math.PI);
-    const diameterMm = diameterM * 1000;
-    const diameterCm = diameterM * 100;
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.classList.add('hidden');
+                }
+                deferredPrompt = null;
+            }
+        });
 
-    // 계산 직경 이하에서 가장 큰 상용 규격 선택. 최소 규격보다 작으면 최소 규격을 안내.
-    let selected = STANDARD_SIZES[0];
-    for (const size of STANDARD_SIZES) {
-      if (size.mm <= diameterMm) selected = size;
-      else break;
-    }
+        window.addEventListener('appinstalled', () => {
+            installBtn.classList.add('hidden');
+            console.log('PWA app installed');
+        });
 
-    const standardDiameterM = selected.mm / 1000;
-    const standardAreaM2 = Math.PI * standardDiameterM * standardDiameterM / 4;
-    const actualVelocity = flowM3Sec / standardAreaM2;
-    const changePct = (actualVelocity - targetVelocity) / targetVelocity * 100;
+        // Initialize Page Data
+        window.addEventListener('DOMContentLoaded', () => {
+            const tbody = document.getElementById('standardTableBody');
+            STANDARD_SIZES.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="py-1 px-2 border border-slate-200 font-mono">${item.inch}"</td>
+                    <td class="py-1 px-2 border border-slate-200 font-medium">${item.mm}</td>
+                `;
+                tbody.appendChild(tr);
+            });
 
-    document.getElementById('resArea').textContent = areaM2.toFixed(4);
-    document.getElementById('resTheoMm').textContent = diameterMm.toFixed(1);
-    document.getElementById('resTheoCm').textContent = diameterCm.toFixed(2);
-    document.getElementById('resStdMm').textContent = selected.mm + ' mm';
-    document.getElementById('resStdInch').textContent = '(' + selected.inch + ' inch)';
-    document.getElementById('resActualVel').textContent = actualVelocity.toFixed(2) + ' m/s';
-    const sign = changePct > 0 ? '+' : '';
-    const status = changePct > 0.05 ? '속도 증가' : changePct < -0.05 ? '속도 감소' : '변화 없음';
-    document.getElementById('resVelChange').textContent = sign + changePct.toFixed(1) + '% (' + status + ')';
-  }
+            calculateDuctSize();
 
-  // 표를 만들고, 최초 계산 및 입력값 변경 시 자동 재계산
-  window.addEventListener('DOMContentLoaded', () => {
-    const tbody = document.getElementById('standardTableBody');
-    if (tbody) {
-      tbody.innerHTML = '';
-      STANDARD_SIZES.forEach(size => {
-        const tr = document.createElement('tr');
-        const inchCell = document.createElement('td');
-        const mmCell = document.createElement('td');
-        inchCell.textContent = size.inch + '”';
-        mmCell.textContent = size.mm;
-        tr.append(inchCell, mmCell);
-        tbody.appendChild(tr);
-      });
-    }
-    document.getElementById('flowRate').addEventListener('input', calculateDuctSize);
-    document.getElementById('velocity').addEventListener('input', calculateDuctSize);
-    calculateDuctSize();
-  });
+            document.getElementById('flowRate').addEventListener('input', calculateDuctSize);
+            document.getElementById('velocity').addEventListener('input', calculateDuctSize);
+        });
 
-  // GitHub Pages 프로젝트 경로에 맞춰 서비스 워커 등록
-  if ('serviceWorker' in navigator && location.protocol === 'https:') {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/duct-calculator-261017-1/service-worker.js', {
-        scope: '/duct-calculator-261017-1/'
-      }).catch((err) => console.error('서비스 워커 등록 실패:', err));
-    });
-  }
+        function setPresetVelocity(val) {
+            document.getElementById('velocity').value = val;
+            calculateDuctSize();
+        }
 
-  // Chrome/Android에서 설치 조건을 충족하면 페이지 안에 설치 버튼 표시
-  let deferredInstallPrompt = null;
-  const installButton = document.getElementById('installButton');
-  const installHelp = document.getElementById('installHelp');
-  window.addEventListener('beforeinstallprompt', (event) => {
-    event.preventDefault();
-    deferredInstallPrompt = event;
-    installButton.hidden = false;
-    installHelp.textContent = '버튼을 눌러 계산기를 휴대폰 앱처럼 설치할 수 있습니다.';
-  });
-  installButton.addEventListener('click', async () => {
-    if (!deferredInstallPrompt) {
-      installHelp.textContent = 'Chrome 메뉴(⋮) → 앱 설치 또는 홈 화면에 추가를 이용해 주세요.';
-      return;
-    }
-    deferredInstallPrompt.prompt();
-    await deferredInstallPrompt.userChoice;
-    deferredInstallPrompt = null;
-    installButton.hidden = true;
-  });
-  window.addEventListener('appinstalled', () => {
-    installButton.hidden = true;
-    installHelp.textContent = '덕트 계산기가 설치되었습니다.';
-  });
-</script>
+        function calculateDuctSize() {
+            const Q_min = parseFloat(document.getElementById('flowRate').value);
+            const V_req = parseFloat(document.getElementById('velocity').value);
+
+            if (isNaN(Q_min) || isNaN(V_req) || Q_min <= 0 || V_req <= 0) {
+                return;
+            }
+
+            // 1. Q unit conversion: m^3/min -> m^3/s
+            const Q_sec = Q_min / 60;
+
+            // 2. Area calculation A (m^2)
+            const A_m2 = Q_sec / V_req;
+
+            // 3. Diameter D (m)
+            const D_m = Math.sqrt((4 * A_m2) / Math.PI);
+            const D_cm = D_m * 100;
+            const D_mm = D_m * 1000;
+
+            // 4. Find largest standard size <= calculated D_mm
+            let selectedStandard = null;
+            for (let i = STANDARD_SIZES.length - 1; i >= 0; i--) {
+                if (STANDARD_SIZES[i].mm <= D_mm) {
+                    selectedStandard = STANDARD_SIZES[i];
+                    break;
+                }
+            }
+
+            if (!selectedStandard) {
+                selectedStandard = STANDARD_SIZES[0];
+            }
+
+            // 5. Calculate actual velocity with selected standard duct size
+            const stdD_m = selectedStandard.mm / 1000;
+            const stdArea_m2 = (Math.PI * Math.pow(stdD_m, 2)) / 4;
+            const V_actual = Q_sec / stdArea_m2;
+            const velChangePct = ((V_actual - V_req) / V_req) * 100;
+
+            // Update UI
+            document.getElementById('resArea').textContent = A_m2.toFixed(4);
+            document.getElementById('resTheoMm').textContent = D_mm.toFixed(1);
+            document.getElementById('resTheoCm').textContent = D_cm.toFixed(2);
+
+            document.getElementById('resStdMm').innerHTML = `${selectedStandard.mm} <span class="text-xl font-normal text-white">mm</span>`;
+            document.getElementById('resStdInch').textContent = `(${selectedStandard.inch} inch)`;
+
+            document.getElementById('resActualVel').textContent = `${V_actual.toFixed(2)} m/s`;
+            
+            const changeSign = velChangePct >= 0 ? '+' : '';
+            document.getElementById('resVelChange').textContent = `${changeSign}${velChangePct.toFixed(1)}% (속도 증가)`;
+        }
+    </script>
 </body>
 </html>
