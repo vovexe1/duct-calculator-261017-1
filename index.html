@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="description" content="국소배기 시스템 원형 덕트 직경 및 상용 규격 계산기">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>산업환기 덕트 사이즈 계산기</title>
+    <!-- FontAwesome for icons -->
+    <!-- Google Fonts Inter & Noto Sans KR -->
+
+    <style>
+      * { box-sizing: border-box; }
+      body { margin:0; font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif; background:#f1f5f9; color:#1e293b; padding-bottom:24px; }
+      header { background:#0f172a; color:white; padding:20px 16px; box-shadow:0 3px 10px #0002; }
+      header h1 { font-size:20px; line-height:1.4; margin:0 0 5px; }
+      header p { color:#cbd5e1; font-size:12px; margin:0; }
+      main, footer { width:min(100% - 24px, 760px); margin:16px auto; }
+      section { margin-bottom:16px; }
+      .panel, .result-card, .theory, .formula { background:white; border:1px solid #e2e8f0; border-radius:16px; padding:18px; margin-bottom:14px; box-shadow:0 5px 18px #0f172a0a; }
+      h2 { font-size:17px; margin:0 0 16px; color:#0f172a; }
+      label { display:block; font-size:14px; font-weight:700; margin:0 0 7px; }
+      input { display:block; width:100%; font-size:18px; padding:13px 12px; border:1px solid #cbd5e1; border-radius:10px; margin-bottom:15px; background:#fff; color:#0f172a; }
+      .hint { font-size:12px; color:#64748b; margin:-9px 0 16px; }
+      .presets { display:flex; flex-wrap:wrap; gap:7px; margin:8px 0 16px; }
+      button { border:1px solid #bfdbfe; background:#eff6ff; color:#1d4ed8; border-radius:9px; padding:10px 12px; font-size:13px; font-weight:650; cursor:pointer; }
+      .primary { width:100%; background:#2563eb; color:white; border:0; padding:14px; font-size:16px; }
+      .hero { background:linear-gradient(135deg,#1e3a8a,#312e81); color:white; border-radius:16px; padding:22px 18px; box-shadow:0 10px 25px #0002; }
+      .pill { display:inline-block; padding:5px 9px; border-radius:20px; background:#ffffff20; color:#dbeafe; font-size:12px; }
+      .big { color:#fcd34d; font-size:42px; font-weight:850; margin:16px 0 2px; line-height:1.2; }
+      .inch { color:#e2e8f0; font-size:21px; font-weight:700; }
+      .stats { display:grid; grid-template-columns:1fr 1fr; gap:12px; border-top:1px solid #ffffff30; margin-top:18px; padding-top:15px; }
+      .stats small { display:block; color:#cbd5e1; font-size:11px; margin-bottom:5px; }
+      .stats strong { color:#a7f3d0; font-size:16px; }
+      .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+      .metric { background:#f8fafc; border:1px solid #e2e8f0; border-radius:11px; padding:12px; }
+      .metric small { display:block; color:#64748b; font-size:12px; margin-bottom:5px; }
+      .metric strong { font-size:19px; }
+      .theory { background:#fffbeb; border-color:#fde68a; font-size:13px; line-height:1.65; }
+      .theory h3 { margin:0 0 8px; color:#92400e; font-size:15px; }
+      details summary { font-weight:700; cursor:pointer; }
+      table { width:100%; border-collapse:collapse; margin-top:12px; font-size:13px; text-align:center; }
+      th,td { border:1px solid #e2e8f0; padding:8px; }
+      th { background:#f1f5f9; }
+      .table-wrap { max-height:260px; overflow:auto; }
+      .formula { font-size:12px; color:#475569; }
+      .formula h3 { color:#0f172a; margin:0 0 12px; font-size:15px; }
+      .formula-grid { display:grid; grid-template-columns:1fr; gap:8px; text-align:center; }
+      .formula-grid div { background:#f8fafc; border:1px solid #e2e8f0; border-radius:9px; padding:10px; }
+      .formula-grid b { display:block; margin:5px; color:#334155; font-family:monospace; }
+      .error { color:#b91c1c; font-size:13px; margin-top:8px; }
+      @media (min-width:680px) { main { display:grid; grid-template-columns:0.9fr 1.1fr; gap:16px; align-items:start; } .formula-grid { grid-template-columns:repeat(3,1fr); } }
+    </style>
+</head>
+<body>
+  <header>
+    <h1>국소배기 시스템 덕트 사이즈 계산기</h1>
+    <p>산업환기 공학 참고 · 모바일 최적화 · 오프라인 사용 가능</p>
+  </header>
+  <main>
+    <section>
+      <div class="panel">
+        <h2>설계 조건 입력</h2>
+        <label for="flowRate">풍량 Q (m³/min)</label>
+        <input type="number" id="flowRate" step="any" min="0" inputmode="decimal" value="30" placeholder="예: 30">
+        <p class="hint">분당 필요 환기량(CMM)</p>
+        <label for="velocity">덕트 속도 V (m/s)</label>
+        <input type="number" id="velocity" step="any" min="0" inputmode="decimal" value="15" placeholder="예: 15">
+        <p class="hint">최소 반송속도를 고려해 설정하세요.</p>
+        <div class="presets">
+          <button type="button" onclick="setPresetVelocity(10)">가스·연기 10 m/s</button>
+          <button type="button" onclick="setPresetVelocity(15)">미세분진 15 m/s</button>
+          <button type="button" onclick="setPresetVelocity(20)">무거운 분진 20 m/s</button>
+        </div>
+        <button type="button" class="primary" onclick="calculateDuctSize()">덕트 규격 산출하기</button>
+        <p id="error" class="error" role="alert"></p>
+      </div>
+      <div class="panel">
+        <details>
+          <summary>상용 덕트 규격표 (24종)</summary>
+          <div class="table-wrap">
+            <table><thead><tr><th>inch</th><th>mm</th></tr></thead><tbody id="standardTableBody"></tbody></table>
+          </div>
+        </details>
+      </div>
+    </section>
+    <section>
+      <div class="hero">
+        <span class="pill">최종 상용 규격 추천</span>
+        <div class="big" id="resStdMm">0 mm</div>
+        <div class="inch" id="resStdInch">(0 inch)</div>
+        <div class="stats">
+          <div><small>상용 규격 적용 시 실제 속도</small><strong id="resActualVel">0 m/s</strong></div>
+          <div><small>속도 변화율</small><strong id="resVelChange">0%</strong></div>
+        </div>
+      </div>
+      <div class="result-card">
+        <h2>이론 계산 결과 (최대 크기)</h2>
+        <div class="grid">
+          <div class="metric"><small>단면적 A</small><strong id="resArea">0</strong><small>m²</small></div>
+          <div class="metric"><small>이론 직경</small><strong id="resTheoMm">0</strong><small>mm</small></div>
+          <div class="metric"><small>이론 직경</small><strong id="resTheoCm">0</strong><small>cm</small></div>
+        </div>
+      </div>
+      <div class="theory">
+        <h3>상용제품 규격 선정 방법</h3>
+        계산된 덕트 직경 이하에서 가장 큰 상용 규격을 선택합니다. 직경이 계산값보다 커지면 덕트 내부 속도가 요구 속도보다 낮아져 분진이 침전될 수 있습니다. 작은 규격을 선택하면 속도는 높아지지만 압력손실이 증가할 수 있습니다.
+      </div>
+    </section>
+  </main>
+  <footer class="formula">
+    <h3>사용된 공학 수식</h3>
+    <div class="formula-grid">
+      <div>단면적 계산<b>A = Q / V</b><small>Q: m³/s, V: m/s</small></div>
+      <div>원형 덕트 직경<b>D = √(4A / π)</b></div>
+      <div>실제 유속<b>V = Q / A</b></div>
+    </div>
+  </footer>
+<script>
+  // 상용 원형 덕트 규격표
+  const STANDARD_SIZES = [
+    { inch: '3/8', mm: 10 }, { inch: '1/2', mm: 15 }, { inch: '3/4', mm: 20 },
+    { inch: '1', mm: 25 }, { inch: '1,1/4', mm: 32 }, { inch: '1,1/2', mm: 40 },
+    { inch: '2', mm: 50 }, { inch: '2,1/2', mm: 65 }, { inch: '3', mm: 80 },
+    { inch: '3,1/2', mm: 90 }, { inch: '4', mm: 100 }, { inch: '5', mm: 125 },
+    { inch: '6', mm: 150 }, { inch: '8', mm: 200 }, { inch: '10', mm: 250 },
+    { inch: '12', mm: 300 }, { inch: '14', mm: 350 }, { inch: '16', mm: 400 },
+    { inch: '18', mm: 450 }, { inch: '20', mm: 500 }, { inch: '22', mm: 550 },
+    { inch: '24', mm: 600 }, { inch: '26', mm: 650 }, { inch: '30', mm: 750 }
+  ];
+
+  function setPresetVelocity(value) {
+    document.getElementById('velocity').value = value;
+    calculateDuctSize();
+  }
+
+  function calculateDuctSize() {
+    const flowInput = document.getElementById('flowRate');
+    const velocityInput = document.getElementById('velocity');
+    const error = document.getElementById('error');
+    const flowM3Min = Number(flowInput.value);
+    const targetVelocity = Number(velocityInput.value);
+
+    if (!flowInput.value || !velocityInput.value || !Number.isFinite(flowM3Min) || !Number.isFinite(targetVelocity) || flowM3Min <= 0 || targetVelocity <= 0) {
+      error.textContent = '풍량과 덕트 속도에 0보다 큰 숫자를 입력하세요.';
+      ['resStdMm','resStdInch','resActualVel','resVelChange','resArea','resTheoMm','resTheoCm'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '—';
+      });
+      return;
+    }
+    error.textContent = '';
+
+    // 입력 풍량은 m³/min이므로 m³/s로 변환
+    const flowM3Sec = flowM3Min / 60;
+    const areaM2 = flowM3Sec / targetVelocity;
+    const diameterM = Math.sqrt((4 * areaM2) / Math.PI);
+    const diameterMm = diameterM * 1000;
+    const diameterCm = diameterM * 100;
+
+    // 계산 직경 이하에서 가장 큰 상용 규격 선택. 최소 규격보다 작으면 최소 규격을 안내.
+    let selected = STANDARD_SIZES[0];
+    for (const size of STANDARD_SIZES) {
+      if (size.mm <= diameterMm) selected = size;
+      else break;
+    }
+
+    const standardDiameterM = selected.mm / 1000;
+    const standardAreaM2 = Math.PI * standardDiameterM * standardDiameterM / 4;
+    const actualVelocity = flowM3Sec / standardAreaM2;
+    const changePct = (actualVelocity - targetVelocity) / targetVelocity * 100;
+
+    document.getElementById('resArea').textContent = areaM2.toFixed(4);
+    document.getElementById('resTheoMm').textContent = diameterMm.toFixed(1);
+    document.getElementById('resTheoCm').textContent = diameterCm.toFixed(2);
+    document.getElementById('resStdMm').textContent = selected.mm + ' mm';
+    document.getElementById('resStdInch').textContent = '(' + selected.inch + ' inch)';
+    document.getElementById('resActualVel').textContent = actualVelocity.toFixed(2) + ' m/s';
+    const sign = changePct > 0 ? '+' : '';
+    const status = changePct > 0.05 ? '속도 증가' : changePct < -0.05 ? '속도 감소' : '변화 없음';
+    document.getElementById('resVelChange').textContent = sign + changePct.toFixed(1) + '% (' + status + ')';
+  }
+
+  // 표를 만들고, 최초 계산 및 입력값 변경 시 자동 재계산
+  window.addEventListener('DOMContentLoaded', () => {
+    const tbody = document.getElementById('standardTableBody');
+    if (tbody) {
+      tbody.innerHTML = '';
+      STANDARD_SIZES.forEach(size => {
+        const tr = document.createElement('tr');
+        const inchCell = document.createElement('td');
+        const mmCell = document.createElement('td');
+        inchCell.textContent = size.inch + '”';
+        mmCell.textContent = size.mm;
+        tr.append(inchCell, mmCell);
+        tbody.appendChild(tr);
+      });
+    }
+    document.getElementById('flowRate').addEventListener('input', calculateDuctSize);
+    document.getElementById('velocity').addEventListener('input', calculateDuctSize);
+    calculateDuctSize();
+  });
+
+  // GitHub Pages에서 접속할 때만 오프라인 캐시를 등록
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(() => {}));
+  }
+</script>
+</body>
+</html>
